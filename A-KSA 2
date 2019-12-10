@@ -1,0 +1,84 @@
+version: '3.3'
+
+services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy:alpine
+    container_name: nginx-proxy
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    labels:
+      com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy: "true"
+    volumes:
+      - ./certs:/etc/nginx/certs:ro
+      - ./vhost.d:/etc/nginx/vhost.d
+      - ./html:/usr/share/nginx/html
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+
+  letsencrypt-companion:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    container_name: nginx-proxy-ssl
+    restart: always
+    volumes:
+      - ./certs:/etc/nginx/certs
+      - ./vhost.d:/etc/nginx/vhost.d
+      - ./html:/usr/share/nginx/html
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - nginx-proxy
+
+  apache:
+    image: 'php:7.3-apache'
+    container_name: php
+    restart: always
+    depends_on:
+      - mariadb
+    volumes:
+      - /var/www/html/aksa:/var/www/html
+    environment:
+      - VIRTUAL_HOST=srv.a-ksa.com
+      - LETSENCRYPT_HOST=srv.a-ksa.com
+      - LETSENCRYPT_EMAIL=tercio@terciomello.com.br
+    links:
+      - mariadb
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadm
+    restart: always
+    depends_on:
+      - mariadb
+    environment:
+      - PMA_ARBITRARY=1
+      - VIRTUAL_HOST=phpmyadmin.a-ksa.com
+      - LETSENCRYPT_HOST=phpmyadmin.a-ksa.com
+      - LETSENCRYPT_EMAIL=tercio@terciomello.com.br
+
+  mariadb:
+    image: mariadb
+    container_name: mariadb
+    restart: always
+    ports:
+      - 3306:3306
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      MYSQL_ROOT_PASSWORD: "!#@zulTI230#"
+
+  vsftpd:
+    image: fauria/vsftpd
+    container_name: vsftpd
+    restart: always
+    volumes:
+      - /var/www/html:/home/vsftpd 
+    ports:
+      - '20:20'
+      - '21:21'
+      - '21100:21100'     
+    environment:
+      - FTP_USER=aksa
+      - FTP_PASS=ZwJk-DFs;ggw
+      - PASV_ADDRESS=127.0.0.1
+      - PASV_MIN_PORT=21100
+      - PASV_MAX_PORT=21100
