@@ -37,9 +37,9 @@ services:
     volumes:
       - /var/www/html/aksa:/var/www/html
     environment:
-      - VIRTUAL_HOST=srv.a-ksa.com
-      - LETSENCRYPT_HOST=srv.a-ksa.com
-      - LETSENCRYPT_EMAIL=tercio@terciomello.com.br
+      - VIRTUAL_HOST=**DOMÍNIO**
+      - LETSENCRYPT_HOST=**DOMÍNIO**
+      - LETSENCRYPT_EMAIL=**E-MAIL**
     links:
       - mariadb
 
@@ -51,9 +51,9 @@ services:
       - mariadb
     environment:
       - PMA_ARBITRARY=1
-      - VIRTUAL_HOST=phpmyadmin.a-ksa.com
-      - LETSENCRYPT_HOST=phpmyadmin.a-ksa.com
-      - LETSENCRYPT_EMAIL=tercio@terciomello.com.br
+      - VIRTUAL_HOST=**DOMÍNIO**
+      - LETSENCRYPT_HOST=**DOMÍNIO**
+      - LETSENCRYPT_EMAIL=**E-MAIL**
 
   mariadb:
     image: mariadb
@@ -64,7 +64,7 @@ services:
     security_opt:
       - no-new-privileges:true
     environment:
-      MYSQL_ROOT_PASSWORD: "!#@zulTI230#"
+      MYSQL_ROOT_PASSWORD: **DEFINA UMA SENHA**
 
   vsftpd:
     image: fauria/vsftpd
@@ -77,8 +77,8 @@ services:
       - '21:21'
       - '21100:21100'     
     environment:
-      - FTP_USER=aksa
-      - FTP_PASS=ZwJk-DFs;ggw
+      - FTP_USER=**USUÁRIO**
+      - FTP_PASS=**SENHA**
       - PASV_ADDRESS=127.0.0.1
       - PASV_MIN_PORT=21100
       - PASV_MAX_PORT=21100
